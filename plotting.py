@@ -17,6 +17,8 @@ def single_region_derivative_plot(region_dataframe, region_name):
 
     plt.legend(loc='lower left')
     
+    return
+    
 
 def single_region_cumulative_plot(cumulative_data, cumulative_errors, region_name, unit,
                                   alimetry_data: pd.DataFrame = None, gravimetry_data: pd.DataFrame = None,
@@ -37,3 +39,38 @@ def single_region_cumulative_plot(cumulative_data, cumulative_errors, region_nam
     plt.title(transform_string(region_name) + ' - {} of ice loss between 2000 and 2024'.format(unit))
 
     plt.legend(loc='lower left')
+
+    return
+
+def region_comparison_plot(region_name, comparison_region_name, cumulative_data_all_gt, cumulative_errors_all_gt, cumulative_data_all_gt_comparison,
+                           cumulative_errors_all_gt_comparison, cumulative_data_all_mwe, cumulative_errors_all_mwe,
+                           cumulative_data_all_mwe_comparison, cumulative_errors_all_mwe_comparison):
+    
+    fig, axs = plt.subplots(1, 2, figsize=(20,8))
+
+    axs[0].plot(cumulative_data_all_gt.dates, cumulative_data_all_gt.changes, linewidth=3, zorder=2, label='Consensus change - ' + transform_string(region_name))
+    axs[0].fill_between(cumulative_data_all_gt.dates, cumulative_data_all_gt.changes - cumulative_errors_all_gt.errors,
+                        cumulative_data_all_gt.changes + cumulative_errors_all_gt.errors, alpha=0.2)
+
+    axs[0].plot(cumulative_data_all_gt_comparison.dates, cumulative_data_all_gt_comparison.changes, linewidth=3, zorder=2, label='Consensus change - ' + transform_string(comparison_region_name))
+    axs[0].fill_between(cumulative_data_all_gt_comparison.dates, cumulative_data_all_gt_comparison.changes - cumulative_errors_all_gt_comparison.errors,
+                        cumulative_data_all_gt_comparison.changes + cumulative_errors_all_gt_comparison.errors, alpha=0.2)
+
+    axs[0].set_xlabel('Year')
+    axs[0].set_ylabel('Cumulative Change [Gt]')
+
+    axs[1].plot(cumulative_data_all_mwe.dates, cumulative_data_all_mwe.changes, linewidth=3, zorder=2, label='Consensus change - ' + transform_string(region_name))
+    axs[1].fill_between(cumulative_data_all_mwe.dates, cumulative_data_all_mwe.changes - cumulative_errors_all_mwe.errors,
+                        cumulative_data_all_mwe.changes + cumulative_errors_all_mwe.errors, alpha=0.2)
+
+    axs[1].plot(cumulative_data_all_mwe_comparison.dates, cumulative_data_all_mwe_comparison.changes, linewidth=3, zorder=2, label='Consensus change - ' + transform_string(comparison_region_name))
+    axs[1].fill_between(cumulative_data_all_mwe_comparison.dates, cumulative_data_all_mwe_comparison.changes - cumulative_errors_all_mwe_comparison.errors,
+                        cumulative_data_all_mwe_comparison.changes + cumulative_errors_all_mwe_comparison.errors, alpha=0.2)
+
+    axs[1].set_xlabel('Year')
+    axs[1].set_ylabel('Cumulative Change [meters water equivalent]')
+
+    axs[0].legend(loc = 'lower left', fontsize=16)
+    plt.suptitle('Regional comparison - ice loss between 2000 and 2024')
+
+    return
