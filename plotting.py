@@ -48,22 +48,22 @@ def region_comparison_plot(region_name, comparison_region_name, cumulative_data_
     
     fig, axs = plt.subplots(1, 2, figsize=(20,8))
 
-    axs[0].plot(cumulative_data_all_gt.dates, cumulative_data_all_gt.changes, linewidth=3, zorder=2, label='Consensus change - ' + transform_string(region_name))
+    axs[0].plot(cumulative_data_all_gt.dates, cumulative_data_all_gt.changes, linewidth=3, zorder=2, label='Combined change - ' + transform_string(region_name))
     axs[0].fill_between(cumulative_data_all_gt.dates, cumulative_data_all_gt.changes - cumulative_errors_all_gt.errors,
                         cumulative_data_all_gt.changes + cumulative_errors_all_gt.errors, alpha=0.2)
 
-    axs[0].plot(cumulative_data_all_gt_comparison.dates, cumulative_data_all_gt_comparison.changes, linewidth=3, zorder=2, label='Consensus change - ' + transform_string(comparison_region_name))
+    axs[0].plot(cumulative_data_all_gt_comparison.dates, cumulative_data_all_gt_comparison.changes, linewidth=3, zorder=2, label='Combined change - ' + transform_string(comparison_region_name))
     axs[0].fill_between(cumulative_data_all_gt_comparison.dates, cumulative_data_all_gt_comparison.changes - cumulative_errors_all_gt_comparison.errors,
                         cumulative_data_all_gt_comparison.changes + cumulative_errors_all_gt_comparison.errors, alpha=0.2)
 
     axs[0].set_xlabel('Year')
     axs[0].set_ylabel('Cumulative Change [Gt]')
 
-    axs[1].plot(cumulative_data_all_mwe.dates, cumulative_data_all_mwe.changes, linewidth=3, zorder=2, label='Consensus change - ' + transform_string(region_name))
+    axs[1].plot(cumulative_data_all_mwe.dates, cumulative_data_all_mwe.changes, linewidth=3, zorder=2, label='Combined change - ' + transform_string(region_name))
     axs[1].fill_between(cumulative_data_all_mwe.dates, cumulative_data_all_mwe.changes - cumulative_errors_all_mwe.errors,
                         cumulative_data_all_mwe.changes + cumulative_errors_all_mwe.errors, alpha=0.2)
 
-    axs[1].plot(cumulative_data_all_mwe_comparison.dates, cumulative_data_all_mwe_comparison.changes, linewidth=3, zorder=2, label='Consensus change - ' + transform_string(comparison_region_name))
+    axs[1].plot(cumulative_data_all_mwe_comparison.dates, cumulative_data_all_mwe_comparison.changes, linewidth=3, zorder=2, label='Combined change - ' + transform_string(comparison_region_name))
     axs[1].fill_between(cumulative_data_all_mwe_comparison.dates, cumulative_data_all_mwe_comparison.changes - cumulative_errors_all_mwe_comparison.errors,
                         cumulative_data_all_mwe_comparison.changes + cumulative_errors_all_mwe_comparison.errors, alpha=0.2)
 
