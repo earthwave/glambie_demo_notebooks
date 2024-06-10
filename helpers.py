@@ -4,7 +4,11 @@ import ipywidgets as widgets
 
 
 def glambie_regions_dropdown(first_region_choice: str = None):
-  regions = {'Alaska': 'alaska', 'Western Canada & US': 'western_canada_us', 'Arctic Canada North': 'arctic_canada_north', 'Arctic Canada South': 'arctic_canada_south', 'Greenland Periphery': 'greenland_periphery', 'Iceland': 'iceland', 'Svalbard': 'svalbard', 'Scandinavia': 'scandinavia', 'Russian Arctic': 'russian_arctic', 'North Asia': 'north_asia', 'Central Europe': 'central_europe', 'Caucasus & Middle East': 'caucasus_middle_east', 'Central Asia': 'central_asia', 'South Asia West': 'south_asia_west', 'Low Latitudes': 'low_latitudes', 'Southern Andes': 'southern_andes', 'New Zealand': 'new_zealand', 'Antarctic and Subantarctic Islands': 'antarctic_and_subantarctic'}
+  regions = {'Alaska': '1_alaska', 'Western Canada & US': '2_western_canada_us', 'Arctic Canada North': '3_arctic_canada_north', 'Arctic Canada South': '4_arctic_canada_south',
+             'Greenland Periphery': '5_greenland_periphery', 'Iceland': '6_iceland', 'Svalbard': '7_svalbard', 'Scandinavia': '8_scandinavia', 'Russian Arctic': '9_russian_arctic',
+             'North Asia': '10_north_asia', 'Central Europe': '11_central_europe', 'Caucasus & Middle East': '12_caucasus_middle_east', 'Central Asia': '13_central_asia',
+             'South Asia West': '14_south_asia_west', 'South Asia East': '15_south_asia_east', 'Low Latitudes': '16_low_latitudes', 'Southern Andes': '17_southern_andes',
+             'New Zealand': '18_new_zealand', 'Antarctic and Subantarctic Islands': '19_antarctic_and_subantarctic'}
   if first_region_choice is not None:
     regions = {key:val for key, val in regions.items() if val != first_region_choice}
   a = widgets.Dropdown(
@@ -49,4 +53,6 @@ def derivative_to_cumulative(start_dates, end_dates, changes, calculate_as_error
 def transform_string(input_string):
     transformed_string = input_string.replace('_', ' ')
     capitalized_string = transformed_string.title()
-    return capitalized_string
+    region_list = capitalized_string.split(' ')[1:]
+    combined_string = " ".join(region_list)
+    return combined_string
