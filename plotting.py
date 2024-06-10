@@ -7,9 +7,9 @@ def single_region_derivative_plot(region_dataframe, region_name, unit):
     
     plt.subplots(1, 1, figsize=(12,8)) # change to end dates - 0.5 years
 
-    plt.plot(region_dataframe.end_dates, region_dataframe.changes, linewidth=3, zorder=2, label='Combined change')
-    plt.fill_between(region_dataframe.end_dates, region_dataframe.changes - region_dataframe.errors,
-                     region_dataframe.changes + region_dataframe.errors, alpha=0.2)
+    plt.plot(region_dataframe.end_dates, region_dataframe.combined_mwe, linewidth=3, zorder=2, label='Combined change')
+    plt.fill_between(region_dataframe.end_dates, region_dataframe.combined_mwe - region_dataframe.combined_mwe_errors,
+                     region_dataframe.combined_mwe + region_dataframe.combined_mwe_errors, alpha=0.2)
     plt.hlines(0, region_dataframe.end_dates.values[0], region_dataframe.end_dates.values[-1], linestyle='dashed', color='purple')
     plt.xlabel('Year')
     plt.ylabel('Elevation Change [{}]'.format(unit))
