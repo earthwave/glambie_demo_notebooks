@@ -11,10 +11,17 @@ def glambie_regions_dropdown(first_region_choice: str = None):
              'New Zealand': '18_new_zealand', 'Antarctic and Subantarctic Islands': '19_antarctic_and_subantarctic'}
   if first_region_choice is not None:
     regions = {key:val for key, val in regions.items() if val != first_region_choice}
-  a = widgets.Dropdown(
-    options=regions,
-    description='Region:'
-)
+  a = widgets.Dropdown(options=regions, description='Region:')
+  return a
+
+
+def glambie_years_dropdown(first_year_choice: int = None):
+  
+  years = np.arange(2000, 2024, 1)
+  if first_year_choice is not None:
+    regions = {key:val for key, val in regions.items() if val != first_year_choice}
+  a = widgets.Dropdown(options=years, description='Year: ')
+  
   return a
 
 
@@ -56,3 +63,35 @@ def transform_string(input_string):
     region_list = capitalized_string.split(' ')[1:]
     combined_string = " ".join(region_list)
     return combined_string
+  
+  
+def load_all_region_dataframes_cumulative(list_of_csvs):
+  
+  glambie_dataframe_dict = {}
+  
+  for file in list_of_csvs:
+    region_name = file.split('.')[0].split('/')[-1]
+    glambie_region_data = pd.read_csv(file)
+    cumulative_data = derivative_to_cumulative(glambie_region_data.start_dates, glambie_region_data.end_dates, glambie_region_data.combined_gt)
+    cumulative_errors = derivative_to_cumulative(glambie_region_data.start_dates, glambie_region_data.end_dates, glambie_region_data.combined_gt_errors, calculate_as_errors=True)
+    
+    region_dataframe_cumulative = pd.DataFrame({'dates': cumulative_data.dates, 'changes': cumulative_data.changes, 'errors': cumulative_errors.errors})
+    
+    glambie_dataframe_dict[region_name] = region_dataframe_cumulative
+    
+  return glambie_dataframe_dict
+
+
+def create_change_dataframe_for_single_year(glambie_dataframe_dict, chosen_year):
+  
+    names, changes, errors = [], [], [] 
+
+    for key, val in glambie_dataframe_dict.items():
+        names.append(transform_string(key))
+        changes.append(val.loc[val.dates == float(chosen_year)]['changes'].values[0])
+        errors.append(val.loc[val.dates == float(chosen_year)]['errors'].values[0])
+        chosen_year_all_regions_df = pd.DataFrame({'region': names, 'change': changes, 'error': errors })
+        
+    chosen_year_all_regions_df.drop(index=0, inplace=True)
+    
+    return chosen_year_all_regions_df

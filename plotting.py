@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 
-from helpers import transform_string
+from helpers import transform_string, create_change_dataframe_for_single_year
 
 def single_region_derivative_plot(region_dataframe, region_name, unit):
     
@@ -108,4 +109,37 @@ def global_comparison_region_plot(cumulative_data_all_gt, cumulative_errors_all_
         plt.title('Global ice loss between 2000 and 2024 - contribution from {}'.format(transform_string(first_region)))
     plt.legend(loc='lower left')
     
+    return
+
+
+def plot_histogram_of_region_contributions_to_global_loss(glambie_dataframe_dict, chosen_year, colors_list):
+
+    chosen_year_all_regions_df = create_change_dataframe_for_single_year(glambie_dataframe_dict, chosen_year)
+    
+    index = np.arange(19)
+    fig, axs = plt.subplots(1, 1, figsize=(10, 10))
+    axs.barh(index, chosen_year_all_regions_df.change, tick_label=chosen_year_all_regions_df.region, color=colors_list)
+    axs.vlines(0, index[0]-1, index[-1]+1, linestyle='dashed', color='k')
+    axs.set_xlim(100, -1200)
+
+    axs.set_xlabel('Cumulative Change in {} [Gt]'.format(chosen_year))
+    
+    return
+
+
+def plot_histogram_of_region_contributions_to_global_loss_two_years(glambie_dataframe_dict, chosen_year, comparison_year):
+    
+    chosen_year_all_regions_df = create_change_dataframe_for_single_year(glambie_dataframe_dict, chosen_year)
+    comparison_year_all_regions_df = create_change_dataframe_for_single_year(glambie_dataframe_dict, comparison_year)
+    bar_width = 0.5
+    
+    index = np.arange(19)
+    fig, axs = plt.subplots(1, 1, figsize=(10, 10))
+    axs.barh(index, chosen_year_all_regions_df.change, bar_width, tick_label=chosen_year_all_regions_df.region, label=str(chosen_year))
+    axs.barh(index+bar_width, comparison_year_all_regions_df.change, bar_width, label=str(comparison_year))
+    axs.vlines(0, index[0]-1, index[-1]+1, linestyle='dashed', color='k')
+    axs.set_xlim(100, -1200)
+
+    axs.set_xlabel('Cumulative Change in {} [Gt]'.format(chosen_year))
+        
     return
