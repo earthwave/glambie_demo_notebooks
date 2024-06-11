@@ -74,3 +74,38 @@ def region_comparison_plot(region_name, comparison_region_name, cumulative_data_
     plt.suptitle('Regional comparison - ice loss between 2000 and 2024')
 
     return
+
+def global_comparison_region_plot(cumulative_data_all_gt, cumulative_errors_all_gt, cumulative_data_first_region_gt, cumulative_errors_first_region_gt, first_region,
+                                  cumulative_data_second_region_gt: pd.DataFrame = None, cumulative_errors_second_region_gt: pd.DataFrame = None, second_region: str = None,
+                                  cumulative_data_third_region_gt: pd.DataFrame = None, cumulative_errors_third_region_gt: pd.DataFrame = None, third_region: str = None, shaded: bool = False):
+    
+    plt.subplots(1, 1, figsize=(12,8))
+
+    plt.plot(cumulative_data_all_gt.dates, cumulative_data_all_gt.changes, linewidth=3, zorder=2, label='Global combined change')
+    plt.fill_between(cumulative_data_all_gt.dates, cumulative_data_all_gt.changes - cumulative_errors_all_gt.errors, cumulative_data_all_gt.changes + cumulative_errors_all_gt.errors, alpha=0.2)
+    
+    plt.plot(cumulative_data_first_region_gt.dates, cumulative_data_first_region_gt.changes, linestyle='dotted', linewidth=3, zorder=2, alpha=0.7, label='{}'.format(transform_string(first_region)))
+    if shaded:
+        plt.fill_between(cumulative_data_first_region_gt.dates, cumulative_data_first_region_gt.changes, alpha=0.2)
+    else:
+        plt.fill_between(cumulative_data_first_region_gt.dates, cumulative_data_first_region_gt.changes - cumulative_errors_first_region_gt.errors, cumulative_data_first_region_gt.changes + cumulative_errors_first_region_gt.errors, alpha=0.2)
+    
+    if cumulative_data_second_region_gt is not None:
+        plt.plot(cumulative_data_second_region_gt.dates, cumulative_data_second_region_gt.changes, linestyle='dotted', linewidth=3, zorder=2, alpha=0.7, label='{}'.format(transform_string(second_region)))
+        plt.fill_between(cumulative_data_second_region_gt.dates, cumulative_data_second_region_gt.changes - cumulative_errors_second_region_gt.errors, cumulative_data_second_region_gt.changes + cumulative_errors_second_region_gt.errors, alpha=0.2)
+    
+    if cumulative_data_third_region_gt is not None:
+        plt.plot(cumulative_data_third_region_gt.dates, cumulative_data_third_region_gt.changes, linestyle='dotted', linewidth=3, zorder=2, alpha=0.7, label='{}'.format(transform_string(third_region)))
+        plt.fill_between(cumulative_data_third_region_gt.dates, cumulative_data_third_region_gt.changes - cumulative_errors_third_region_gt.errors, cumulative_data_third_region_gt.changes + cumulative_errors_third_region_gt.errors, alpha=0.2)
+
+    plt.xlabel('Year')
+    plt.ylabel('Cumulative Change [Gt]')
+    
+    plt.legend(loc = 'lower left', fontsize=16)
+    if second_region is not None:
+        plt.title('Global ice loss between 2000 and 2024 - contributions from {}, {} and {}'.format(transform_string(first_region), transform_string(second_region), transform_string(third_region)))
+    else:
+        plt.title('Global ice loss between 2000 and 2024 - contribution from {}'.format(transform_string(first_region)))
+    plt.legend(loc='lower left')
+    
+    return
