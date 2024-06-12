@@ -17,7 +17,7 @@ def glambie_regions_dropdown(first_region_choice: str = None):
 
 def glambie_years_dropdown(first_year_choice: int = None):
   
-  years = np.arange(2000, 2024, 1)
+  years = np.arange(2001, 2024, 1)
   if first_year_choice is not None:
     regions = {key:val for key, val in regions.items() if val != first_year_choice}
   a = widgets.Dropdown(options=years, description='Year: ')
@@ -91,7 +91,8 @@ def create_change_dataframe_for_single_year(glambie_dataframe_dict, chosen_year)
         changes.append(val.loc[val.dates == float(chosen_year)]['changes'].values[0])
         errors.append(val.loc[val.dates == float(chosen_year)]['errors'].values[0])
         chosen_year_all_regions_df = pd.DataFrame({'region': names, 'change': changes, 'error': errors })
-        
+    
+    total_change = chosen_year_all_regions_df.iloc[0].change
     chosen_year_all_regions_df.drop(index=0, inplace=True)
     
-    return chosen_year_all_regions_df
+    return chosen_year_all_regions_df, total_change
