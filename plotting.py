@@ -76,13 +76,58 @@ def region_comparison_plot(region_name, comparison_region_name, cumulative_data_
 
     return
 
+
+def global_cumulative_plot(cumulative_data, cumulative_errors, global_dataframe, unit, colors_list):
+    
+    _, axs = plt.subplots(1, 1, figsize=(12,8))
+    axs_2 = axs.twinx()  
+    
+    axs.bar(global_dataframe.start_dates, global_dataframe.combined_mwe, yerr=global_dataframe.combined_mwe_errors, capsize=3, color=colors_list[1], ecolor=colors_list[1], alpha=0.3, zorder=1) 
+    axs.hlines(0, min(global_dataframe.start_dates), min(global_dataframe.start_dates), linestyle='dashed', color='k')
+    axs.set_ylabel('Annual Change [m w.e. yr^-1]')
+    axs.set_ylim(-1.0, 0.05)
+
+    axs_2.plot(cumulative_data.dates, cumulative_data.changes, linewidth=3, zorder=2)
+    axs_2.fill_between(cumulative_data.dates, cumulative_data.changes - cumulative_errors.errors, cumulative_data.changes + cumulative_errors.errors, alpha=0.2, zorder=2)
+
+    axs_2.set_xlabel('Year')
+    axs_2.set_ylabel('Cumulative Change [{}]'.format(unit))
+    axs_2.set_title('Giga tonnes of global ice loss between 2000 and 2024')
+    axs_2.set_ylim(-7000, 0.05)
+    
+    axs.grid(False)
+
+    return
+
+
+def global_comparison_stacked_region_plot(cumulative_data_all_gt, cumulative_errors_all_gt, cumulative_data_first_region_gt, first_region,
+                                          cumulative_data_second_region_gt: pd.DataFrame = None, second_region: str = None,
+                                          cumulative_data_third_region_gt: pd.DataFrame = None, third_region: str = None):
+    
+    plt.subplots(1, 1, figsize=(12,8))
+
+    plt.plot(cumulative_data_all_gt.dates, cumulative_data_all_gt.changes, linewidth=3, zorder=2, label='Global change')
+    plt.fill_between(cumulative_data_all_gt.dates, cumulative_data_all_gt.changes - cumulative_errors_all_gt.errors, cumulative_data_all_gt.changes + cumulative_errors_all_gt.errors, alpha=0.2)
+    
+    y = [cumulative_data_first_region_gt.changes,cumulative_data_second_region_gt.changes, cumulative_data_third_region_gt.changes]
+    
+    plt.stackplot(cumulative_data_all_gt.dates, y, labels=[transform_string(first_region), transform_string(second_region), transform_string(third_region)], alpha=0.4)
+
+    plt.xlabel('Year')
+    plt.ylabel('Cumulative Change [Gt]')
+    
+    plt.legend(loc = 'lower left', fontsize=16)
+
+    plt.title('Global ice loss between 2000 and 2024 - contributions from {}, {} and {}'.format(transform_string(first_region), transform_string(second_region), transform_string(third_region)))
+
+
 def global_comparison_region_plot(cumulative_data_all_gt, cumulative_errors_all_gt, cumulative_data_first_region_gt, cumulative_errors_first_region_gt, first_region,
                                   cumulative_data_second_region_gt: pd.DataFrame = None, cumulative_errors_second_region_gt: pd.DataFrame = None, second_region: str = None,
                                   cumulative_data_third_region_gt: pd.DataFrame = None, cumulative_errors_third_region_gt: pd.DataFrame = None, third_region: str = None, shaded: bool = False):
     
     plt.subplots(1, 1, figsize=(12,8))
 
-    plt.plot(cumulative_data_all_gt.dates, cumulative_data_all_gt.changes, linewidth=3, zorder=2, label='Global combined change')
+    plt.plot(cumulative_data_all_gt.dates, cumulative_data_all_gt.changes, linewidth=3, zorder=2, label='Global change')
     plt.fill_between(cumulative_data_all_gt.dates, cumulative_data_all_gt.changes - cumulative_errors_all_gt.errors, cumulative_data_all_gt.changes + cumulative_errors_all_gt.errors, alpha=0.2)
     
     plt.plot(cumulative_data_first_region_gt.dates, cumulative_data_first_region_gt.changes, linestyle='dotted', linewidth=3, zorder=2, alpha=0.7, label='{}'.format(transform_string(first_region)))
@@ -112,7 +157,7 @@ def global_comparison_region_plot(cumulative_data_all_gt, cumulative_errors_all_
     return
 
 
-def plot_histogram_of_region_contributions_to_global_loss(glambie_dataframe_dict, chosen_year, colors_list):
+def histogram_of_region_contributions_to_global_loss(glambie_dataframe_dict, chosen_year, colors_list):
 
     chosen_year_all_regions_df, total_change = create_change_dataframe_for_single_year(glambie_dataframe_dict, chosen_year)
     
@@ -126,7 +171,7 @@ def plot_histogram_of_region_contributions_to_global_loss(glambie_dataframe_dict
     plt.tight_layout()
 
 
-def plot_histogram_of_region_contributions_to_global_loss_two_years(glambie_dataframe_dict, chosen_year, comparison_year):
+def histogram_of_region_contributions_to_global_loss_two_years(glambie_dataframe_dict, chosen_year, comparison_year):
     
     chosen_year_all_regions_df, total_change = create_change_dataframe_for_single_year(glambie_dataframe_dict, chosen_year)
     comparison_year_all_regions_df, total_change_comparison = create_change_dataframe_for_single_year(glambie_dataframe_dict, comparison_year)

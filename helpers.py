@@ -1,17 +1,21 @@
+import os
 import numpy as np
 import pandas as pd
 import ipywidgets as widgets
 
 
+GLAMBIE_REGIONS_DICT = {'Alaska': '1_alaska', 'Western Canada & US': '2_western_canada_us', 'Arctic Canada North': '3_arctic_canada_north', 'Arctic Canada South': '4_arctic_canada_south',
+                        'Greenland Periphery': '5_greenland_periphery', 'Iceland': '6_iceland', 'Svalbard': '7_svalbard', 'Scandinavia': '8_scandinavia', 'Russian Arctic': '9_russian_arctic',
+                        'North Asia': '10_north_asia', 'Central Europe': '11_central_europe', 'Caucasus & Middle East': '12_caucasus_middle_east', 'Central Asia': '13_central_asia',
+                        'South Asia West': '14_south_asia_west', 'South Asia East': '15_south_asia_east', 'Low Latitudes': '16_low_latitudes', 'Southern Andes': '17_southern_andes',
+                        'New Zealand': '18_new_zealand', 'Antarctic and Subantarctic Islands': '19_antarctic_and_subantarctic'}
+
+
 def glambie_regions_dropdown(first_region_choice: str = None):
-  regions = {'Alaska': '1_alaska', 'Western Canada & US': '2_western_canada_us', 'Arctic Canada North': '3_arctic_canada_north', 'Arctic Canada South': '4_arctic_canada_south',
-             'Greenland Periphery': '5_greenland_periphery', 'Iceland': '6_iceland', 'Svalbard': '7_svalbard', 'Scandinavia': '8_scandinavia', 'Russian Arctic': '9_russian_arctic',
-             'North Asia': '10_north_asia', 'Central Europe': '11_central_europe', 'Caucasus & Middle East': '12_caucasus_middle_east', 'Central Asia': '13_central_asia',
-             'South Asia West': '14_south_asia_west', 'South Asia East': '15_south_asia_east', 'Low Latitudes': '16_low_latitudes', 'Southern Andes': '17_southern_andes',
-             'New Zealand': '18_new_zealand', 'Antarctic and Subantarctic Islands': '19_antarctic_and_subantarctic'}
+  glambie_regions = GLAMBIE_REGIONS_DICT.copy()
   if first_region_choice is not None:
-    regions = {key:val for key, val in regions.items() if val != first_region_choice}
-  a = widgets.Dropdown(options=regions, description='Region:')
+    glambie_regions = {key:val for key, val in glambie_regions.items() if val != first_region_choice}
+  a = widgets.Dropdown(options=glambie_regions, description='Region:')
   return a
 
 
@@ -65,13 +69,14 @@ def transform_string(input_string):
     return combined_string
   
   
-def load_all_region_dataframes_cumulative(list_of_csvs):
+def load_all_region_dataframes_cumulative(data_directory):
   
   glambie_dataframe_dict = {}
   
-  for file in list_of_csvs:
-    region_name = file.split('.')[0].split('/')[-1]
-    glambie_region_data = pd.read_csv(file)
+  for _, val in GLAMBIE_REGIONS_DICT.items():
+    filename = os.path.join(data_directory, val + '.csv')
+    region_name = filename.split('.')[0].split('/')[-1]
+    glambie_region_data = pd.read_csv(filename)
     cumulative_data = derivative_to_cumulative(glambie_region_data.start_dates, glambie_region_data.end_dates, glambie_region_data.combined_gt)
     cumulative_errors = derivative_to_cumulative(glambie_region_data.start_dates, glambie_region_data.end_dates, glambie_region_data.combined_gt_errors, calculate_as_errors=True)
     
@@ -93,6 +98,5 @@ def create_change_dataframe_for_single_year(glambie_dataframe_dict, chosen_year)
         chosen_year_all_regions_df = pd.DataFrame({'region': names, 'change': changes, 'error': errors })
     
     total_change = chosen_year_all_regions_df.iloc[0].change
-    chosen_year_all_regions_df.drop(index=0, inplace=True)
     
     return chosen_year_all_regions_df, total_change
