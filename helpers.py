@@ -87,7 +87,7 @@ def load_all_region_dataframes_cumulative(data_directory):
   return glambie_dataframe_dict
 
 
-def create_change_dataframe_for_single_year(glambie_dataframe_dict, chosen_year):
+def create_change_dataframe_for_single_year(glambie_dataframe_dict, global_dict, chosen_year):
   
     names, changes, errors = [], [], [] 
 
@@ -97,6 +97,6 @@ def create_change_dataframe_for_single_year(glambie_dataframe_dict, chosen_year)
         errors.append(val.loc[val.dates == float(chosen_year)]['errors'].values[0])
         chosen_year_all_regions_df = pd.DataFrame({'region': names, 'change': changes, 'error': errors })
     
-    total_change = chosen_year_all_regions_df.iloc[0].change
+    total_change = global_dict.loc[global_dict.dates == float(chosen_year)]['changes'].values[0]
     
     return chosen_year_all_regions_df, total_change

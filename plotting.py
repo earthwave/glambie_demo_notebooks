@@ -157,9 +157,9 @@ def global_comparison_region_plot(cumulative_data_all_gt, cumulative_errors_all_
     return
 
 
-def histogram_of_region_contributions_to_global_loss(glambie_dataframe_dict, chosen_year, colors_list):
+def histogram_of_region_contributions_to_global_loss(glambie_dataframe_dict, global_dict, chosen_year, colors_list):
 
-    chosen_year_all_regions_df, total_change = create_change_dataframe_for_single_year(glambie_dataframe_dict, chosen_year)
+    chosen_year_all_regions_df, total_change = create_change_dataframe_for_single_year(glambie_dataframe_dict, global_dict, chosen_year)
     
     index = np.arange(19)
     # Show proportion of total change that comes from each region
@@ -171,10 +171,10 @@ def histogram_of_region_contributions_to_global_loss(glambie_dataframe_dict, cho
     plt.tight_layout()
 
 
-def histogram_of_region_contributions_to_global_loss_two_years(glambie_dataframe_dict, chosen_year, comparison_year):
+def histogram_of_region_contributions_to_global_loss_two_years(glambie_dataframe_dict, global_dict, chosen_year, comparison_year):
     
-    chosen_year_all_regions_df, total_change = create_change_dataframe_for_single_year(glambie_dataframe_dict, chosen_year)
-    comparison_year_all_regions_df, total_change_comparison = create_change_dataframe_for_single_year(glambie_dataframe_dict, comparison_year)
+    chosen_year_all_regions_df, total_change = create_change_dataframe_for_single_year(glambie_dataframe_dict, global_dict, chosen_year)
+    comparison_year_all_regions_df, total_change_comparison = create_change_dataframe_for_single_year(glambie_dataframe_dict, global_dict, comparison_year)
     bar_width = 0.35
     
     index = np.arange(19)
