@@ -59,17 +59,9 @@ def derivative_to_cumulative(start_dates, end_dates, changes, calculate_as_error
         return pd.DataFrame({'dates': dates, 'errors': changes})
     else:
         return pd.DataFrame({'dates': dates, 'changes': changes})
-    
-
-def transform_string(input_string):
-    transformed_string = input_string.replace('_', ' ')
-    capitalized_string = transformed_string.title()
-    region_list = capitalized_string.split(' ')[1:]
-    combined_string = " ".join(region_list)
-    return combined_string
   
   
-def load_all_region_dataframes_cumulative(data_directory):
+def load_all_region_dataframes(data_directory):
   
   glambie_dataframe_dict = {}
   
@@ -85,18 +77,3 @@ def load_all_region_dataframes_cumulative(data_directory):
     glambie_dataframe_dict[region_name] = region_dataframe_cumulative
     
   return glambie_dataframe_dict
-
-
-def create_change_dataframe_for_single_year(glambie_dataframe_dict, global_dict, chosen_year):
-  
-    names, changes, errors = [], [], [] 
-
-    for key, val in glambie_dataframe_dict.items():
-        names.append(transform_string(key))
-        changes.append(val.loc[val.dates == float(chosen_year)]['changes'].values[0])
-        errors.append(val.loc[val.dates == float(chosen_year)]['errors'].values[0])
-        chosen_year_all_regions_df = pd.DataFrame({'region': names, 'change': changes, 'error': errors })
-    
-    total_change = global_dict.loc[global_dict.dates == float(chosen_year)]['changes'].values[0]
-    
-    return chosen_year_all_regions_df, total_change

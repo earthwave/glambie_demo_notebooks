@@ -2,7 +2,28 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-from helpers import transform_string, create_change_dataframe_for_single_year
+def transform_string(input_string):
+    transformed_string = input_string.replace('_', ' ')
+    capitalized_string = transformed_string.title()
+    region_list = capitalized_string.split(' ')[1:]
+    combined_string = " ".join(region_list)
+    return combined_string
+
+
+def create_change_dataframe_for_single_year(glambie_dataframe_dict, global_dict, chosen_year):
+  
+    names, changes, errors = [], [], [] 
+
+    for key, val in glambie_dataframe_dict.items():
+        names.append(transform_string(key))
+        changes.append(val.loc[val.dates == float(chosen_year)]['changes'].values[0])
+        errors.append(val.loc[val.dates == float(chosen_year)]['errors'].values[0])
+        chosen_year_all_regions_df = pd.DataFrame({'region': names, 'change': changes, 'error': errors })
+    
+    total_change = global_dict.loc[global_dict.dates == float(chosen_year)]['changes'].values[0]
+    
+    return chosen_year_all_regions_df, total_change
+
 
 def single_region_derivative_plot(region_dataframe, region_name, unit):
     
@@ -166,7 +187,7 @@ def histogram_of_region_contributions_to_global_loss(glambie_dataframe_dict, glo
     fig, axs = plt.subplots(1, 1, figsize=(10, 10))
     axs.barh(index, (chosen_year_all_regions_df.change / total_change)*100, tick_label=chosen_year_all_regions_df.region, color=colors_list)
 
-    axs.set_xlabel('Percentage of Global Cumulative Change 2000 - {} [%]'.format(chosen_year))
+    axs.set_xlabel('Percentage of Global Cumulative Change [%]'.format(chosen_year))
     plt.suptitle('Global Cumulative Change 2000 - {} = {} Gt'.format(chosen_year, round(total_change, 2)))
     plt.tight_layout()
 
@@ -179,9 +200,10 @@ def histogram_of_region_contributions_to_global_loss_two_years(glambie_dataframe
     
     index = np.arange(19)
     fig, axs = plt.subplots(1, 1, figsize=(10, 10))
-    axs.barh(index, (chosen_year_all_regions_df.change / total_change)*100, bar_width, tick_label=chosen_year_all_regions_df.region, label='Change from 2000 - {}'.format(str(chosen_year)))
-    axs.barh(index+bar_width, (comparison_year_all_regions_df.change / total_change_comparison)*100, bar_width, label='Change from 2000 - {}'.format(str(comparison_year)))
+    axs.barh(index, (chosen_year_all_regions_df.change / total_change)*100, bar_width, tick_label=chosen_year_all_regions_df.region, label='{}'.format(str(chosen_year)))
+    axs.barh(index+bar_width, (comparison_year_all_regions_df.change / total_change_comparison)*100, bar_width, label='{}'.format(str(comparison_year)))
 
     axs.set_xlabel('Percentage of Global Cumulative Change [%]')
     
     plt.legend(loc='upper right', fontsize=16)
+    
