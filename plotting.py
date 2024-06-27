@@ -98,12 +98,12 @@ def region_comparison_plot(region_name, comparison_region_name, cumulative_data_
     return
 
 
-def global_cumulative_plot(cumulative_data, cumulative_errors, global_dataframe, unit, colors_list):
+def global_cumulative_plot(cumulative_data, cumulative_errors, global_dataframe, unit):
     
     _, axs = plt.subplots(1, 1, figsize=(12,8))
     axs_2 = axs.twinx()  
     
-    axs.bar(global_dataframe.start_dates, global_dataframe.combined_mwe, yerr=global_dataframe.combined_mwe_errors, capsize=3, color=colors_list[1], ecolor=colors_list[1], alpha=0.3, zorder=1) 
+    axs.bar(global_dataframe.start_dates, global_dataframe.combined_mwe, yerr=global_dataframe.combined_mwe_errors, capsize=3, color='coral', ecolor='coral', alpha=0.3, zorder=1) 
     axs.hlines(0, min(global_dataframe.start_dates), min(global_dataframe.start_dates), linestyle='dashed', color='k')
     axs.set_ylabel('Annual Change [m w.e. yr^-1]')
     axs.set_ylim(-1.0, 0.05)
@@ -207,3 +207,29 @@ def histogram_of_region_contributions_to_global_loss_two_years(glambie_dataframe
     
     plt.legend(loc='upper right', fontsize=16)
     
+
+def global_stacked_all_regions_plot(cumulative_data_all_gt, glambie_dataframe_dict):
+
+    y2 = {key:val.changes for key, val in glambie_dataframe_dict.items()}
+    stack_data = list(y2.values())
+    labels = list(y2.keys())
+    
+    labels_formatted = [transform_string(a) for a in labels]
+
+    fig, ax = plt.subplots(1, 1, figsize=(12,8))
+
+    plt.plot(cumulative_data_all_gt.dates, cumulative_data_all_gt.changes, linewidth=5, zorder=2, label='Global change')
+
+    plt.stackplot(cumulative_data_all_gt.dates, stack_data, labels=labels_formatted, alpha=0.4)
+
+    plt.xlabel('Year')
+    plt.ylabel('Cumulative Change [Gt]')
+
+    # Shrink current axis by 20%
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+    # Put a legend to the right of the current axis
+    ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+    plt.title('Global ice loss between 2000 and 2024')
