@@ -101,12 +101,12 @@ def region_comparison_plot(region_name, comparison_region_name, cumulative_data_
 def global_cumulative_plot(cumulative_data, cumulative_errors, global_dataframe, unit):
     
     _, axs = plt.subplots(1, 1, figsize=(12,8))
+    axs.set_ylim(-1.0, 0.05)
     axs_2 = axs.twinx()  
     
     axs.bar(global_dataframe.start_dates, global_dataframe.combined_mwe, yerr=global_dataframe.combined_mwe_errors, capsize=3, color='coral', ecolor='coral', alpha=0.3, zorder=1) 
     axs.hlines(0, min(global_dataframe.start_dates), min(global_dataframe.start_dates), linestyle='dashed', color='k')
     axs.set_ylabel('Annual Change [m w.e. yr^-1]')
-    axs.set_ylim(-1.0, 0.05)
 
     axs_2.plot(cumulative_data.dates, cumulative_data.changes, linewidth=3, zorder=2)
     axs_2.fill_between(cumulative_data.dates, cumulative_data.changes - cumulative_errors.errors, cumulative_data.changes + cumulative_errors.errors, alpha=0.2, zorder=2)
@@ -114,8 +114,7 @@ def global_cumulative_plot(cumulative_data, cumulative_errors, global_dataframe,
     axs_2.set_xlabel('Year')
     axs_2.set_ylabel('Cumulative Change [{}]'.format(unit))
     axs_2.set_title('Giga tonnes of global ice loss between 2000 and 2023')
-    axs_2.set_ylim(-7000, 0.05)
-    
+
     axs.grid(False)
 
     return
