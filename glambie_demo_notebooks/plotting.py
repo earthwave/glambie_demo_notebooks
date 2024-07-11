@@ -27,12 +27,12 @@ def create_change_dataframe_for_single_year(glambie_dataframe_dict, global_dict,
 
 def single_region_derivative_plot(region_dataframe, region_name, unit):
     
-    plt.subplots(1, 1, figsize=(12,8)) # change to end dates - 0.5 years
+    plt.subplots(1, 1, figsize=(12,8))
 
-    plt.plot(region_dataframe.end_dates, region_dataframe.combined_mwe, linewidth=3, zorder=2, label='Combined change')
-    plt.fill_between(region_dataframe.end_dates, region_dataframe.combined_mwe - region_dataframe.combined_mwe_errors,
+    plt.plot(region_dataframe.end_dates - 0.5, region_dataframe.combined_mwe, linewidth=3, zorder=2, label='Combined change')
+    plt.fill_between(region_dataframe.end_dates - 0.5, region_dataframe.combined_mwe - region_dataframe.combined_mwe_errors,
                      region_dataframe.combined_mwe + region_dataframe.combined_mwe_errors, alpha=0.2)
-    plt.hlines(0, region_dataframe.end_dates.values[0], region_dataframe.end_dates.values[-1], linestyle='dashed', color='purple')
+    plt.hlines(0, region_dataframe.end_dates.values[0] - 0.5, region_dataframe.end_dates.values[-1], linestyle='dashed', color='purple')
     plt.xlabel('Year')
     plt.ylabel('Elevation Change [{}]'.format(unit))
     plt.title(transform_string(region_name) + ' - change in elevation, 2000 - 2023')
@@ -64,11 +64,11 @@ def single_region_cumulative_plot(cumulative_data, cumulative_errors, region_nam
 
     return
 
-def region_comparison_plot(region_name, comparison_region_name, cumulative_data_all_gt, cumulative_errors_all_gt, cumulative_data_all_gt_comparison,
-                           cumulative_errors_all_gt_comparison, cumulative_data_all_mwe, cumulative_errors_all_mwe,
-                           cumulative_data_all_mwe_comparison, cumulative_errors_all_mwe_comparison):
+def two_region_comparison_plot(region_name, comparison_region_name, cumulative_data_all_gt, cumulative_errors_all_gt, cumulative_data_all_gt_comparison,
+                               cumulative_errors_all_gt_comparison, cumulative_data_all_mwe, cumulative_errors_all_mwe,
+                               cumulative_data_all_mwe_comparison, cumulative_errors_all_mwe_comparison):
     
-    fig, axs = plt.subplots(1, 2, figsize=(20,8))
+    _, axs = plt.subplots(1, 2, figsize=(20,8))
 
     axs[0].plot(cumulative_data_all_gt.dates, cumulative_data_all_gt.changes, linewidth=3, zorder=2, label='Combined change - ' + transform_string(region_name))
     axs[0].fill_between(cumulative_data_all_gt.dates, cumulative_data_all_gt.changes - cumulative_errors_all_gt.errors,
@@ -198,7 +198,7 @@ def histogram_of_region_contributions_to_global_loss_two_years(glambie_dataframe
     bar_width = 0.35
     
     index = np.arange(19)
-    fig, axs = plt.subplots(1, 1, figsize=(10, 10))
+    _, axs = plt.subplots(1, 1, figsize=(10, 10))
     axs.barh(index, (chosen_year_all_regions_df.change / total_change)*100, bar_width, tick_label=chosen_year_all_regions_df.region, label='{}'.format(str(chosen_year)))
     axs.barh(index+bar_width, (comparison_year_all_regions_df.change / total_change_comparison)*100, bar_width, label='{}'.format(str(comparison_year)))
 
@@ -215,20 +215,16 @@ def global_stacked_all_regions_plot(cumulative_data_all_gt, glambie_dataframe_di
     
     labels_formatted = [transform_string(a) for a in labels]
 
-    fig, ax = plt.subplots(1, 1, figsize=(12,8))
+    _, ax = plt.subplots(1, 1, figsize=(12,8))
 
     plt.plot(cumulative_data_all_gt.dates, cumulative_data_all_gt.changes, linewidth=5, zorder=2, label='Global change')
-
     plt.stackplot(cumulative_data_all_gt.dates, stack_data, labels=labels_formatted, alpha=0.4)
 
     plt.xlabel('Year')
     plt.ylabel('Cumulative Change [Gt]')
 
-    # Shrink current axis by 20%
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
-
-    # Put a legend to the right of the current axis
     ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
     plt.title('Global ice loss between 2000 and 2023')
