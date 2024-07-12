@@ -4,7 +4,7 @@ import pandas as pd
 import ipywidgets as widgets
 
 
-GLAMBIE_REGIONS_DICT = {'Alaska': '1_alaska', 'Western Canada & US': '2_western_canada_us', 'Arctic Canada North': '3_arctic_canada_north', 'Arctic Canada South': '4_arctic_canada_south',
+GLAMBIE_REGIONS_DICT = {'Alaska': '1_alaska', 'Western Canada & USA': '2_western_canada_us', 'Arctic Canada North': '3_arctic_canada_north', 'Arctic Canada South': '4_arctic_canada_south',
                         'Greenland Periphery': '5_greenland_periphery', 'Iceland': '6_iceland', 'Svalbard': '7_svalbard', 'Scandinavia': '8_scandinavia', 'Russian Arctic': '9_russian_arctic',
                         'North Asia': '10_north_asia', 'Central Europe': '11_central_europe', 'Caucasus & Middle East': '12_caucasus_middle_east', 'Central Asia': '13_central_asia',
                         'South Asia West': '14_south_asia_west', 'South Asia East': '15_south_asia_east', 'Low Latitudes': '16_low_latitudes', 'Southern Andes': '17_southern_andes',

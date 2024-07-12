@@ -2,11 +2,15 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
+from glambie.plot.plot_helpers import apply_vertical_adjustment_for_cumulative_plot
+
 def transform_string(input_string):
     transformed_string = input_string.replace('_', ' ')
     capitalized_string = transformed_string.title()
     region_list = capitalized_string.split(' ')[1:]
     combined_string = " ".join(region_list)
+    if 'Western Canada Us' in combined_string:
+        combined_string = 'Western Canada & USA'
     return combined_string
 
 
@@ -25,6 +29,21 @@ def create_change_dataframe_for_single_year(glambie_dataframe_dict, global_dict,
     return chosen_year_all_regions_df, total_change
 
 
+def apply_vertical_adjustment(timeseries_to_adjust, reference_timeseries):
+
+    # Drop first zero row and any nan rows in each cumulative dataframe
+    filtered_df = timeseries_to_adjust[(abs(timeseries_to_adjust['changes']) > 0)]
+    
+    # apply adjustment if there are any non-nan change values left
+    if pd.isna(filtered_df.changes[1:]).all():
+        adjusted_df = timeseries_to_adjust.copy()
+        adjusted_df.changes = np.nan
+    else:
+        adjusted_df = apply_vertical_adjustment_for_cumulative_plot(filtered_df, reference_timeseries)
+
+    return adjusted_df
+
+
 def single_region_derivative_plot(region_dataframe, region_name, unit):
     
     plt.subplots(1, 1, figsize=(12,8))
@@ -35,7 +54,7 @@ def single_region_derivative_plot(region_dataframe, region_name, unit):
     plt.hlines(0, region_dataframe.end_dates.values[0] - 0.5, region_dataframe.end_dates.values[-1], linestyle='dashed', color='purple')
     plt.xlabel('Year')
     plt.ylabel('Elevation Change [{}]'.format(unit))
-    plt.title(transform_string(region_name) + ' - change in elevation, 2000 - 2023')
+    plt.title(transform_string(region_name) + ' - change in elevation, 2000 - 2023', fontsize=18)
 
     plt.legend(loc='lower left')
     
@@ -46,19 +65,22 @@ def single_region_cumulative_plot(cumulative_data, cumulative_errors, region_nam
                                   alimetry_data: pd.DataFrame = None, gravimetry_data: pd.DataFrame = None,
                                   demdiff_and_glaciological_data: pd.DataFrame = None):
     
+    if alimetry_data is not None:
+        alimetry_data_adjusted = apply_vertical_adjustment(alimetry_data, cumulative_data)
+        gravimetry_data_adjusted = apply_vertical_adjustment(gravimetry_data, cumulative_data)
+        demdiff_and_glaciological_data_adjusted = apply_vertical_adjustment(demdiff_and_glaciological_data, cumulative_data)
+    
     plt.subplots(1, 1, figsize=(12,8))
 
-    plt.plot(cumulative_data.dates, cumulative_data.changes, linewidth=3, zorder=2, label='Combined change')
+    plt.plot(cumulative_data.dates, cumulative_data.changes, linewidth=3, zorder=1, label='Combined change')
     plt.fill_between(cumulative_data.dates, cumulative_data.changes - cumulative_errors.errors, cumulative_data.changes + cumulative_errors.errors, alpha=0.2)
     if alimetry_data is not None:
-        plt.plot(alimetry_data.dates, alimetry_data.changes, linestyle='dashed', zorder=1, alpha=0.7, label='Altimetry')
-    if gravimetry_data is not None:
-        plt.plot(gravimetry_data.dates, gravimetry_data.changes, linestyle='dashed', zorder=1, alpha=0.7, label='Gravimetry')
-    if demdiff_and_glaciological_data is not None:
-        plt.plot(demdiff_and_glaciological_data.dates, demdiff_and_glaciological_data.changes, linestyle='dashed', zorder=1, alpha=0.7, label='DemDiff and Glaciological')
+        plt.plot(alimetry_data_adjusted.dates, alimetry_data_adjusted.changes, linestyle='dashed', zorder=2, alpha=0.9, label='Altimetry')
+        plt.plot(gravimetry_data_adjusted.dates, gravimetry_data_adjusted.changes, linestyle='dashed', zorder=2, alpha=0.9, label='Gravimetry')
+        plt.plot(demdiff_and_glaciological_data_adjusted.dates, demdiff_and_glaciological_data_adjusted.changes, linestyle='dashed', zorder=2, alpha=0.9, label='DEM Differencing and glaciological')
     plt.xlabel('Year')
     plt.ylabel('Cumulative Change [{}]'.format(unit))
-    plt.title(transform_string(region_name) + ' - {} of ice loss, 2000 - 2023'.format(unit))
+    plt.title(transform_string(region_name) + ' - {} of ice loss, 2000 - 2023'.format(unit), fontsize=18)
 
     plt.legend(loc='lower left')
 
@@ -93,7 +115,7 @@ def two_region_comparison_plot(region_name, comparison_region_name, cumulative_d
     axs[1].set_ylabel('Cumulative Change [metres water equivalent]')
 
     axs[0].legend(loc = 'lower left', fontsize=16)
-    plt.suptitle('Regional comparison - total ice loss, 2000 - 2023')
+    plt.suptitle('Regional comparison - total ice loss, 2000 - 2023', fontsize=18)
 
     return
 
@@ -113,7 +135,7 @@ def global_cumulative_plot(cumulative_data, cumulative_errors, global_dataframe,
 
     axs_2.set_xlabel('Year')
     axs_2.set_ylabel('Cumulative Change [{}]'.format(unit))
-    axs_2.set_title('Giga tonnes of global ice loss between 2000 and 2023')
+    axs_2.set_title('Giga tonnes of global ice loss between 2000 and 2023', fontsize=18)
 
     axs.grid(False)
 
@@ -138,7 +160,7 @@ def global_comparison_stacked_region_plot(cumulative_data_all_gt, cumulative_err
     
     plt.legend(loc = 'lower left', fontsize=16)
 
-    plt.title('Global ice loss between 2000 and 2023 - contributions from {}, {} and {}'.format(transform_string(first_region), transform_string(second_region), transform_string(third_region)))
+    plt.title('Global ice loss between 2000 and 2023 - contributions from {}, {} and {}'.format(transform_string(first_region), transform_string(second_region), transform_string(third_region)), fontsize=18)
 
 
 def global_comparison_region_plot(cumulative_data_all_gt, cumulative_errors_all_gt, cumulative_data_first_region_gt, cumulative_errors_first_region_gt, first_region,
@@ -169,9 +191,9 @@ def global_comparison_region_plot(cumulative_data_all_gt, cumulative_errors_all_
     
     plt.legend(loc = 'lower left', fontsize=16)
     if second_region is not None:
-        plt.title('Global ice loss between 2000 and 2023 - contributions from {}, {} and {}'.format(transform_string(first_region), transform_string(second_region), transform_string(third_region)))
+        plt.title('Global ice loss between 2000 and 2023 - contributions from {}, {} and {}'.format(transform_string(first_region), transform_string(second_region), transform_string(third_region)), fontsize=18)
     else:
-        plt.title('Global ice loss between 2000 and 2023 - contribution from {}'.format(transform_string(first_region)))
+        plt.title('Global ice loss between 2000 and 2023 - contribution from {}'.format(transform_string(first_region)), fontsize=18)
     plt.legend(loc='lower left')
     
     return
@@ -187,7 +209,7 @@ def histogram_of_region_contributions_to_global_loss(glambie_dataframe_dict, glo
     axs.barh(index, (chosen_year_all_regions_df.change / total_change)*100, tick_label=chosen_year_all_regions_df.region, color=colors_list)
 
     axs.set_xlabel('Percentage of Global Cumulative Change [%]'.format(chosen_year))
-    plt.suptitle('Global Cumulative Change 2000 - {} = {} Gt'.format(chosen_year, round(total_change, 2)))
+    plt.suptitle('Global Cumulative Change 2000 - {} = {} Gt'.format(chosen_year, round(total_change, 2)), fontsize=18)
     plt.tight_layout()
 
 
@@ -227,4 +249,4 @@ def global_stacked_all_regions_plot(cumulative_data_all_gt, glambie_dataframe_di
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
     ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
-    plt.title('Global ice loss between 2000 and 2023')
+    plt.title('Global ice loss between 2000 and 2023', fontsize=18)
