@@ -128,7 +128,7 @@ def global_cumulative_plot(cumulative_data, cumulative_errors, global_dataframe,
     
     axs.bar(global_dataframe.start_dates, global_dataframe.combined_mwe, yerr=global_dataframe.combined_mwe_errors, capsize=3, color='coral', ecolor='coral', alpha=0.3, zorder=1) 
     axs.hlines(0, min(global_dataframe.start_dates), min(global_dataframe.start_dates), linestyle='dashed', color='k')
-    axs.set_ylabel('Annual Change [m w.e. yr^-1]')
+    axs.set_ylabel('Annual Change [m w.e. yr$^{-1}$]')
 
     axs_2.plot(cumulative_data.dates, cumulative_data.changes, linewidth=3, zorder=2)
     axs_2.fill_between(cumulative_data.dates, cumulative_data.changes - cumulative_errors.errors, cumulative_data.changes + cumulative_errors.errors, alpha=0.2, zorder=2)
@@ -221,8 +221,8 @@ def histogram_of_region_contributions_to_global_loss_two_years(glambie_dataframe
     
     index = np.arange(19)
     _, axs = plt.subplots(1, 1, figsize=(10, 10))
-    axs.barh(index, (chosen_year_all_regions_df.change / total_change)*100, bar_width, tick_label=chosen_year_all_regions_df.region, label='{}'.format(str(chosen_year)))
-    axs.barh(index+bar_width, (comparison_year_all_regions_df.change / total_change_comparison)*100, bar_width, label='{}'.format(str(comparison_year)))
+    axs.barh(index, (chosen_year_all_regions_df.change / total_change)*100, bar_width, tick_label=chosen_year_all_regions_df.region, label='2000 - {}'.format(str(chosen_year)))
+    axs.barh(index+bar_width, (comparison_year_all_regions_df.change / total_change_comparison)*100, bar_width, label='2000 - {}'.format(str(comparison_year)))
 
     axs.set_xlabel('Percentage of Global Cumulative Change [%]')
     
