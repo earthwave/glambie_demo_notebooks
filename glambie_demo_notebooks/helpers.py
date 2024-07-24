@@ -56,14 +56,19 @@ def derivative_to_cumulative(start_dates, end_dates, changes, calculate_as_error
     dates = [start_dates[0], *end_dates]
 
     if calculate_as_errors:
-        return pd.DataFrame({'dates': dates, 'errors': changes})
+        cumulative_data = pd.DataFrame({'dates': dates, 'errors': changes})
+        cumulative_data.drop(cumulative_data.head(1).index, inplace=True)
     else:
-        return pd.DataFrame({'dates': dates, 'changes': changes})
+        cumulative_data = pd.DataFrame({'dates': dates, 'changes': changes})
+        cumulative_data.drop(cumulative_data.head(1).index, inplace=True)
+      
+    return cumulative_data
+
   
   
 def load_all_region_dataframes(data_directory):
   
-  glambie_dataframe_dict = {}
+  glambie_dataframe_dict_cumulative, glambie_dataframe_dict_derivative = {}, {}
   
   for _, val in GLAMBIE_REGIONS_DICT.items():
     filename = os.path.join(data_directory, val + '.csv')
@@ -73,7 +78,9 @@ def load_all_region_dataframes(data_directory):
     cumulative_errors = derivative_to_cumulative(glambie_region_data.start_dates, glambie_region_data.end_dates, glambie_region_data.combined_gt_errors, calculate_as_errors=True)
     
     region_dataframe_cumulative = pd.DataFrame({'dates': cumulative_data.dates, 'changes': cumulative_data.changes, 'errors': cumulative_errors.errors})
+    region_dataframe_derivative = pd.DataFrame({'dates': glambie_region_data.end_dates, 'changes': glambie_region_data.combined_gt, 'errors': glambie_region_data.combined_gt_errors})
     
-    glambie_dataframe_dict[region_name] = region_dataframe_cumulative
-    
-  return glambie_dataframe_dict
+    glambie_dataframe_dict_cumulative[region_name] = region_dataframe_cumulative
+    glambie_dataframe_dict_derivative[region_name] = region_dataframe_derivative
+  
+  return glambie_dataframe_dict_cumulative, glambie_dataframe_dict_derivative

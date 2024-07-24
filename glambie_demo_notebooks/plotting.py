@@ -24,8 +24,12 @@ def create_change_dataframe_for_single_year(glambie_dataframe_dict, global_dict,
         errors.append(val.loc[val.dates == float(chosen_year)]['errors'].values[0])
         chosen_year_all_regions_df = pd.DataFrame({'region': names, 'change': changes, 'error': errors })
     
-    total_change = global_dict.loc[global_dict.dates == float(chosen_year)]['changes'].values[0]
-    
+    print(global_dict.columns)
+    if 'dates' in global_dict.columns:
+        total_change = global_dict.loc[global_dict.dates == float(chosen_year)]['changes'].values[0]
+    else:
+        total_change = global_dict.loc[global_dict.end_dates == float(chosen_year)]['combined_gt'].values[0]
+
     return chosen_year_all_regions_df, total_change
 
 
@@ -54,7 +58,7 @@ def single_region_derivative_plot(region_dataframe, region_name, unit):
     plt.hlines(0, region_dataframe.end_dates.values[0] - 0.5, region_dataframe.end_dates.values[-1], linestyle='dashed', color='purple')
     plt.xlabel('Year')
     plt.ylabel('Elevation Change [{}]'.format(unit))
-    plt.title(transform_string(region_name) + ' - change in elevation, 2000 - 2023', fontsize=18)
+    plt.title(transform_string(region_name) + ': change in elevation, 2000 - 2023', fontsize=18)
 
     plt.legend(loc='lower left')
     
@@ -68,19 +72,18 @@ def single_region_cumulative_plot(cumulative_data, cumulative_errors, region_nam
     if alimetry_data is not None:
         alimetry_data_adjusted = apply_vertical_adjustment(alimetry_data, cumulative_data)
         gravimetry_data_adjusted = apply_vertical_adjustment(gravimetry_data, cumulative_data)
-        demdiff_and_glaciological_data_adjusted = apply_vertical_adjustment(demdiff_and_glaciological_data, cumulative_data)
     
     plt.subplots(1, 1, figsize=(12,8))
 
     plt.plot(cumulative_data.dates, cumulative_data.changes, linewidth=3, zorder=1, label='Combined change')
     plt.fill_between(cumulative_data.dates, cumulative_data.changes - cumulative_errors.errors, cumulative_data.changes + cumulative_errors.errors, alpha=0.2)
     if alimetry_data is not None:
-        plt.plot(alimetry_data_adjusted.dates, alimetry_data_adjusted.changes, linestyle='dashed', zorder=2, alpha=0.9, label='Altimetry')
-        plt.plot(gravimetry_data_adjusted.dates, gravimetry_data_adjusted.changes, linestyle='dashed', zorder=2, alpha=0.9, label='Gravimetry')
-        plt.plot(demdiff_and_glaciological_data_adjusted.dates, demdiff_and_glaciological_data_adjusted.changes, linestyle='dashed', zorder=2, alpha=0.9, label='DEM Differencing and glaciological')
+        plt.plot(alimetry_data_adjusted.dates, alimetry_data_adjusted.changes, linestyle='dashed', zorder=2, alpha=0.7, linewidth=2, label='Altimetry')
+        plt.plot(gravimetry_data_adjusted.dates, gravimetry_data_adjusted.changes, linestyle='dashed', alpha=0.7, linewidth=2,  label='Gravimetry')
+        plt.plot(demdiff_and_glaciological_data.dates, demdiff_and_glaciological_data.changes, linestyle='dashed', alpha=0.7, linewidth=2, label='DEM Differencing and glaciological')
     plt.xlabel('Year')
     plt.ylabel('Cumulative Change [{}]'.format(unit))
-    plt.title(transform_string(region_name) + ' - {} of ice loss, 2000 - 2023'.format(unit), fontsize=18)
+    plt.title(transform_string(region_name) + ': {} of ice loss, 2000 - 2023'.format(unit), fontsize=18)
 
     plt.legend(loc='lower left')
 
@@ -115,7 +118,7 @@ def two_region_comparison_plot(region_name, comparison_region_name, cumulative_d
     axs[1].set_ylabel('Cumulative Change [metres water equivalent]')
 
     axs[0].legend(loc = 'lower left', fontsize=16)
-    plt.suptitle('Regional comparison - total ice loss, 2000 - 2023', fontsize=18)
+    plt.suptitle('Regional comparison: total ice loss, 2000 - 2023', fontsize=18)
 
     return
 
@@ -126,8 +129,7 @@ def global_cumulative_plot(cumulative_data, cumulative_errors, global_dataframe,
     axs.set_ylim(-1.0, 0.05)
     axs_2 = axs.twinx()  
     
-    axs.bar(global_dataframe.start_dates, global_dataframe.combined_mwe, yerr=global_dataframe.combined_mwe_errors, capsize=3, color='coral', ecolor='coral', alpha=0.3, zorder=1) 
-    axs.hlines(0, min(global_dataframe.start_dates), min(global_dataframe.start_dates), linestyle='dashed', color='k')
+    axs.bar(global_dataframe.end_dates, global_dataframe.combined_mwe, yerr=global_dataframe.combined_mwe_errors, capsize=3, color='coral', ecolor='coral', alpha=0.3, zorder=1) 
     axs.set_ylabel('Annual Change [m w.e. yr$^{-1}$]')
 
     axs_2.plot(cumulative_data.dates, cumulative_data.changes, linewidth=3, zorder=2)
@@ -135,7 +137,7 @@ def global_cumulative_plot(cumulative_data, cumulative_errors, global_dataframe,
 
     axs_2.set_xlabel('Year')
     axs_2.set_ylabel('Cumulative Change [{}]'.format(unit))
-    axs_2.set_title('Giga tonnes of global ice loss between 2000 and 2023', fontsize=18)
+    axs_2.set_title('Giga tonnes of global ice loss from 2000 - 2023', fontsize=18)
 
     axs.grid(False)
 
@@ -160,7 +162,7 @@ def global_comparison_stacked_region_plot(cumulative_data_all_gt, cumulative_err
     
     plt.legend(loc = 'lower left', fontsize=16)
 
-    plt.title('Global ice loss between 2000 and 2023 - contributions from {}, {} and {}'.format(transform_string(first_region), transform_string(second_region), transform_string(third_region)), fontsize=18)
+    plt.title('Global ice loss from 2000 - 2023: contributions from {}, {} and {}'.format(transform_string(first_region), transform_string(second_region), transform_string(third_region)), fontsize=18)
 
 
 def global_comparison_region_plot(cumulative_data_all_gt, cumulative_errors_all_gt, cumulative_data_first_region_gt, cumulative_errors_first_region_gt, first_region,
@@ -191,15 +193,13 @@ def global_comparison_region_plot(cumulative_data_all_gt, cumulative_errors_all_
     
     plt.legend(loc = 'lower left', fontsize=16)
     if second_region is not None:
-        plt.title('Global ice loss between 2000 and 2023 - contributions from {}, {} and {}'.format(transform_string(first_region), transform_string(second_region), transform_string(third_region)), fontsize=18)
-    else:
-        plt.title('Global ice loss between 2000 and 2023 - contribution from {}'.format(transform_string(first_region)), fontsize=18)
+        plt.title('Global ice loss from 2000 - 2023: contributions from {}, {} and {}'.format(transform_string(first_region), transform_string(second_region), transform_string(third_region)), fontsize=18)
     plt.legend(loc='lower left')
     
     return
 
 
-def histogram_of_region_contributions_to_global_loss(glambie_dataframe_dict, global_dict, chosen_year, colors_list):
+def histogram_of_region_contributions_to_global_loss(glambie_dataframe_dict, global_dict, chosen_year, colors_list, type):
 
     chosen_year_all_regions_df, total_change = create_change_dataframe_for_single_year(glambie_dataframe_dict, global_dict, chosen_year)
     
@@ -208,12 +208,18 @@ def histogram_of_region_contributions_to_global_loss(glambie_dataframe_dict, glo
     fig, axs = plt.subplots(1, 1, figsize=(10, 10))
     axs.barh(index, (chosen_year_all_regions_df.change / total_change)*100, tick_label=chosen_year_all_regions_df.region, color=colors_list)
 
-    axs.set_xlabel('Percentage of Global Cumulative Change [%]'.format(chosen_year))
-    plt.suptitle('Global Cumulative Change 2000 - {} = {} Gt'.format(chosen_year, round(total_change, 2)), fontsize=18)
+    if type == 'cumulative':
+        axs.set_xlabel('Percentage of Global Cumulative Ice Loss per Region [%]'.format(chosen_year))
+        plt.suptitle('Global Cumulative Ice Loss, 2000 - {} = {} Gt'.format(chosen_year, round(total_change, 2)), fontsize=18)
+    
+    elif type == 'derivative':
+        axs.set_xlabel('Percentage of Global Ice Loss per Region [%]')
+        plt.suptitle('Global Ice Loss in {} = {} Gt'.format(chosen_year, round(total_change, 2)), fontsize=18)
+
     plt.tight_layout()
 
 
-def histogram_of_region_contributions_to_global_loss_two_years(glambie_dataframe_dict, global_dict, chosen_year, comparison_year):
+def histogram_of_region_contributions_to_global_loss_two_years(glambie_dataframe_dict, global_dict, chosen_year, comparison_year, type):
     
     chosen_year_all_regions_df, total_change = create_change_dataframe_for_single_year(glambie_dataframe_dict, global_dict, chosen_year)
     comparison_year_all_regions_df, total_change_comparison = create_change_dataframe_for_single_year(glambie_dataframe_dict, global_dict, comparison_year)
@@ -221,19 +227,25 @@ def histogram_of_region_contributions_to_global_loss_two_years(glambie_dataframe
     
     index = np.arange(19)
     _, axs = plt.subplots(1, 1, figsize=(10, 10))
-    axs.barh(index, (chosen_year_all_regions_df.change / total_change)*100, bar_width, tick_label=chosen_year_all_regions_df.region, label='2000 - {}'.format(str(chosen_year)))
-    axs.barh(index+bar_width, (comparison_year_all_regions_df.change / total_change_comparison)*100, bar_width, label='2000 - {}'.format(str(comparison_year)))
-
-    axs.set_xlabel('Percentage of Global Cumulative Change [%]')
+    if type == 'cumulative':
+        axs.barh(index, (chosen_year_all_regions_df.change / total_change)*100, bar_width, tick_label=chosen_year_all_regions_df.region, label='2000 - {}'.format(str(chosen_year)))
+        axs.barh(index+bar_width, (comparison_year_all_regions_df.change / total_change_comparison)*100, bar_width, label='2000 - {}'.format(str(comparison_year)))
+        axs.set_xlabel('Percentage of Global Cumulative Ice Loss per Region [%]')
+    elif type == 'derivative':
+        axs.barh(index, (chosen_year_all_regions_df.change / total_change)*100, bar_width, tick_label=chosen_year_all_regions_df.region, label='{}'.format(str(chosen_year)))
+        axs.barh(index+bar_width, (comparison_year_all_regions_df.change / total_change_comparison)*100, bar_width, label='{}'.format(str(comparison_year)))
+        axs.set_xlabel('Percentage of Global Ice Loss per Region [%]')   
     
     plt.legend(loc='upper right', fontsize=16)
     
 
 def global_stacked_all_regions_plot(cumulative_data_all_gt, glambie_dataframe_dict):
 
-    y2 = {key:val.changes for key, val in glambie_dataframe_dict.items()}
-    stack_data = list(y2.values())
-    labels = list(y2.keys())
+    y2 = {key:val.changes.tolist() for key, val in glambie_dataframe_dict.items()}
+    sorted_dict = dict(sorted(y2.items(), key=lambda e: e[1][-1]))
+    
+    stack_data = list(sorted_dict.values())
+    labels = list(sorted_dict.keys())
     
     labels_formatted = [transform_string(a) for a in labels]
 
