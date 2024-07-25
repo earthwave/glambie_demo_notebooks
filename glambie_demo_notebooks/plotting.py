@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import math
 
-from glambie.plot.plot_helpers import apply_vertical_adjustment_for_cumulative_plot
 
 def transform_string(input_string):
     transformed_string = input_string.replace('_', ' ')
@@ -12,6 +12,15 @@ def transform_string(input_string):
     if 'Western Canada Us' in combined_string:
         combined_string = 'Western Canada & USA'
     return combined_string
+
+
+def timeseries_as_months(fractional_year_array):
+
+    t0 = math.floor(np.min(fractional_year_array) * 12) / 12.
+    t1 = math.ceil(np.max(fractional_year_array) * 12) / 12.
+    monthly_array = np.arange(math.ceil((t1 - t0 + 0.00001) * 12)) / 12. + t0
+
+    return monthly_array
 
 
 def create_change_dataframe_for_single_year(glambie_dataframe_dict, global_dict, chosen_year):
@@ -38,14 +47,21 @@ def apply_vertical_adjustment(timeseries_to_adjust, reference_timeseries):
     # Drop first zero row and any nan rows in each cumulative dataframe
     filtered_df = timeseries_to_adjust[(abs(timeseries_to_adjust['changes']) > 0)]
     
-    # apply adjustment if there are any non-nan change values left
+    # Only apply adjustment if there are any non-nan change values left
     if pd.isna(filtered_df.changes[1:]).all():
-        adjusted_df = timeseries_to_adjust.copy()
-        adjusted_df.changes = np.nan
+        adjusted_timeseries = timeseries_to_adjust.copy()
+        adjusted_timeseries.changes = np.nan
     else:
-        adjusted_df = apply_vertical_adjustment_for_cumulative_plot(filtered_df, reference_timeseries)
-
-    return adjusted_df
+        adjustment = None
+        adjustment_date = timeseries_as_months([filtered_df.dates.iloc[0]])[0]
+        
+        row = reference_timeseries[reference_timeseries.dates == adjustment_date]
+        adjustment = row.iloc[0].changes
+        
+        adjusted_timeseries = filtered_df.copy()
+        adjusted_timeseries.changes = adjusted_timeseries.changes + adjustment
+        
+    return adjusted_timeseries
 
 
 def single_region_derivative_plot(region_dataframe, region_name, unit):
