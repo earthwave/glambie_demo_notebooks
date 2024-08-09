@@ -56,7 +56,9 @@ def apply_vertical_adjustment(timeseries_to_adjust, reference_timeseries):
         adjustment_date = timeseries_as_months([filtered_df.dates.iloc[0]])[0]
         
         row = reference_timeseries[reference_timeseries.dates == adjustment_date]
-        adjustment = row.iloc[0].changes
+        reference_change = row.iloc[0].changes
+        row_2 = timeseries_to_adjust[timeseries_to_adjust.dates == adjustment_date]
+        adjustment = reference_change - row_2.iloc[0].changes
         
         adjusted_timeseries = filtered_df.copy()
         adjusted_timeseries.changes = adjusted_timeseries.changes + adjustment
@@ -91,12 +93,12 @@ def single_region_cumulative_plot(cumulative_data, cumulative_errors, region_nam
     
     plt.subplots(1, 1, figsize=(12,8))
 
-    plt.plot(cumulative_data.dates, cumulative_data.changes, linewidth=3, zorder=1, label='Combined change')
-    plt.fill_between(cumulative_data.dates, cumulative_data.changes - cumulative_errors.errors, cumulative_data.changes + cumulative_errors.errors, alpha=0.2)
+    plt.plot(cumulative_data.dates, cumulative_data.changes, linewidth=5, zorder=1, alpha=0.7, label='Combined change')
+    plt.fill_between(cumulative_data.dates, cumulative_data.changes - cumulative_errors.errors, cumulative_data.changes + cumulative_errors.errors, alpha=0.1)
     if alimetry_data is not None:
-        plt.plot(alimetry_data_adjusted.dates, alimetry_data_adjusted.changes, linestyle='dashed', zorder=2, alpha=0.7, linewidth=2, label='Altimetry')
-        plt.plot(gravimetry_data_adjusted.dates, gravimetry_data_adjusted.changes, linestyle='dashed', alpha=0.7, linewidth=2,  label='Gravimetry')
-        plt.plot(demdiff_and_glaciological_data.dates, demdiff_and_glaciological_data.changes, linestyle='dashed', alpha=0.7, linewidth=2, label='DEM Differencing and glaciological')
+        plt.plot(alimetry_data_adjusted.dates, alimetry_data_adjusted.changes, linestyle='dashed', zorder=2, alpha=0.9, linewidth=2, label='Altimetry')
+        plt.plot(gravimetry_data_adjusted.dates, gravimetry_data_adjusted.changes, linestyle='dashed', alpha=0.9, linewidth=2,  label='Gravimetry')
+        plt.plot(demdiff_and_glaciological_data.dates, demdiff_and_glaciological_data.changes, linestyle='dashed', alpha=0.9, linewidth=2, label='DEM Differencing and glaciological')
     plt.xlabel('Year')
     plt.ylabel('Cumulative Change [{}]'.format(unit))
     plt.title(transform_string(region_name) + ': {} of ice loss, 2000 - 2023'.format(unit), fontsize=18)
