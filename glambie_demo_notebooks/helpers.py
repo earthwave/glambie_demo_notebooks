@@ -57,10 +57,8 @@ def derivative_to_cumulative(start_dates, end_dates, changes, calculate_as_error
 
     if calculate_as_errors:
         cumulative_data = pd.DataFrame({'dates': dates, 'errors': changes})
-        cumulative_data.drop(cumulative_data.head(1).index, inplace=True)
     else:
         cumulative_data = pd.DataFrame({'dates': dates, 'changes': changes})
-        cumulative_data.drop(cumulative_data.head(1).index, inplace=True)
       
     return cumulative_data
 
