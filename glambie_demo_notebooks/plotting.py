@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import math
-import seaborn as sns
+
 
 def transform_string(input_string):
     transformed_string = input_string.replace('_', ' ')
@@ -289,7 +289,7 @@ def global_stacked_all_regions_plot(cumulative_data_all_gt, glambie_dataframe_di
     axs.set_xlim(2000,2024)
 
     plt.plot(cumulative_data_all_gt.dates, cumulative_data_all_gt.changes, linewidth=5, zorder=2, label='Global change')
-    plt.stackplot(cumulative_data_all_gt.dates, stack_data, labels=labels_formatted, alpha=0.4)
+    plt.stackplot(cumulative_data_all_gt.dates, stack_data, labels=labels_formatted, alpha=0.3)
 
     plt.xlabel('Year')
     plt.ylabel('Cumulative Change [Gt]')
