@@ -11,11 +11,11 @@ GLAMBIE_REGIONS_DICT = {'Alaska': '1_alaska', 'Western Canada & USA': '2_western
                         'New Zealand': '18_new_zealand', 'Antarctic and Subantarctic Islands': '19_antarctic_and_subantarctic'}
 
 
-def glambie_regions_dropdown(first_region_choice: str = None):
+def glambie_regions_dropdown(first_region_choice: list[str] = None):
   glambie_regions = GLAMBIE_REGIONS_DICT.copy()
   if first_region_choice is not None:
-    glambie_regions = {key:val for key, val in glambie_regions.items() if val != first_region_choice}
-  a = widgets.Dropdown(options=glambie_regions, description='Region:')
+    glambie_regions = {key:val for key, val in glambie_regions.items() if val not in first_region_choice}
+  a = widgets.Dropdown(options=glambie_regions, description='Select Region:')
   return a
 
 
