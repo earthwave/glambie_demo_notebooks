@@ -23,7 +23,7 @@ def glambie_years_dropdown(first_year_choice: int = None):
   
   years = np.arange(2001, 2024, 1)
   if first_year_choice is not None:
-    regions = {key:val for key, val in regions.items() if val != first_year_choice}
+    years = {key:val for key, val in years.items() if val != first_year_choice}
   a = widgets.Dropdown(options=years, description='Year: ')
   
   return a
